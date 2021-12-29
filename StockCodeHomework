@@ -1,0 +1,80 @@
+Sub vbahomework()
+For Each ws In Worksheets
+
+'Name Variables
+Dim StockName As String
+Dim StockCount As Variant
+Dim StockTableRow As Integer
+Dim Stockchange As Variant
+Dim Stockpercent As Variant
+Dim OpeningValue As Variant
+Dim ClosingValue As Variant
+
+'Set My Values
+Stockchange = 0
+StockCount = 0
+lastrow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+StockTableRow = 2
+OpeningValue = ws.Cells(2, 3).Value
+
+'Naming New Table Columns
+ws.Range("J1").Value = "Stock Name"
+ws.Range("K1").Value = "Yearly Change"
+ws.Range("L1").Value = "Percent Change"
+ws.Range("M1").Value = "Total Stock Volume"
+
+
+'Start Loop
+For i = 2 To lastrow
+
+'Conditionals
+If ws.Cells(i, 1).Value <> ws.Cells(i + 1, 1).Value Then
+StockName = ws.Cells(i, 1).Value
+ClosingValue = ws.Cells(i, 6).Value
+StockCount = StockCount + ws.Cells(i, 7).Value
+
+'Determining Yearly Change and Percent Change
+Stockchange = ClosingValue - OpeningValue
+    If OpeningValue = 0 Then
+    Stockpercent = 0
+    Else
+    Stockpercent = (Stockchange / OpeningValue)
+ End If
+ 
+'Moving Values to table
+ws.Range("j" & StockTableRow).Value = StockName
+ws.Range("m" & StockTableRow).Value = StockCount
+ws.Range("K" & StockTableRow).Value = Stockchange
+ws.Range("L" & StockTableRow).Value = Stockpercent
+ws.Range("L" & StockTableRow).NumberFormat = "0.00%"
+ws.Columns("J:M").AutoFit
+
+'conditional formatting
+    If Stockchange > 0 Then
+    ws.Range("K" & StockTableRow).Interior.ColorIndex = 4
+    Else
+    ws.Range("K" & StockTableRow).Interior.ColorIndex = 3
+
+    End If
+
+'Resetting Values so that total goes back to 0
+    StockTableRow = StockTableRow + 1
+    StockCount = 0
+    OpeningValue = ws.Cells(i + 1, 3).Value
+
+
+Else
+
+'If symbols are the same, keep adding; If not, move to next symbol
+    StockCount = StockCount + ws.Cells(i, 7).Value
+
+End If
+
+Next i
+
+Next ws
+
+'End of loop
+
+End Sub
+
